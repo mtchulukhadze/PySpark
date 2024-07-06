@@ -1,0 +1,24 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import to_date
+from pyspark.sql.functions import regexp_replace, col
+
+# create spark name
+spark = SparkSession.builder.appName("Data Analysis Spark").getOrCreate()
+
+# read data using spark
+stock = spark.read.csv("D:\Data\Data Engineering\BRK-B.csv", header=True)
+
+# check dataset schema
+stock.printSchema()
+
+# cast to date
+stock = stock.withColumn("Date", to_date(stock["Date"], "M/d/yyyy"))
+
+
+columns_to_convert = ["Close/Last", "Open", "High", "Low", "Volume"]
+for column in columns_to_convert:
+    stock = stock.withColumn(column, regexp_replace(col(column), "\\$", "").cast("float"))
+
+
+# print data
+stock.show(5)
