@@ -1,0 +1,28 @@
+from pyspark.sql import SparkSession
+import findspark
+findspark.init()
+
+# Path to the SQL Server JDBC driver
+jdbc_driver_path = "C:\\Spark\\spark-3.5.1-bin-hadoop3\\jars\\apache-spark-sql-connector.jar"
+
+# Create a Spark session and include the JDBC driver in the classpath
+spark = SparkSession.builder \
+    .appName("Spark Data Engineering") \
+    .config("spark.driver.extraClassPath", jdbc_driver_path) \
+    .getOrCreate()
+
+# Define the connection parameters
+jdbc_url = "jdbc:sqlserver://DESKTOP-3QJN7S3:1433;databaseName=data_analysis_project;integratedSecurity=true;"
+table_name = "data_analysis_project.dbo.sales"
+
+# Properties
+db_properties = {
+    "driver": "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+}
+
+# Read data from SQL Server into a Spark DataFrame
+df = spark.read.jdbc(url=jdbc_url, table=table_name, properties=db_properties)
+
+# Show the schema and data
+df.printSchema()
+df.show(5)
