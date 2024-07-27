@@ -1,0 +1,31 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import split, col
+
+spark = SparkSession.builder.appName('Orders').getOrCreate()
+
+file_path = r"D:\Data\Data Engineering\Big Data CS_Project\Udemy_Spark\RetailDB+SalesData\RetailDB SalesData\Orders\part-00000"
+ord1 = spark.read.text(file_path)
+ord1.show(truncate=False)
+
+file_path1 = r"D:\Data\Data Engineering\Big Data CS_Project\Udemy_Spark\RetailDB+SalesData\RetailDB SalesData\Products\part-00000"
+products = spark.read.text(file_path)
+products.show(5, truncate=False)
+
+product_split = products.withColumn("split_col", split(col("value"), ","))
+
+df_final = product_split.select(
+    col("split_col")[0].alias("id"),
+    col("split_col")[1].alias("date"),
+    col("split_col")[2].alias("product_id"),
+    col("split_col")[3].alias("status")
+)
+df_final.show(5, truncate=False)
+
+order_split = ord1.withColumn("split_col", split(col("value"), ","))
+order_data = order_split.select(
+    col("split_col")[0].alias("id"),
+    col("split_col")[1].alias("date"),
+    col("split_col")[2].alias("product_id"),
+    col("split_col")[3].alias("status")
+)
+order_data.show(10, truncate=False)
