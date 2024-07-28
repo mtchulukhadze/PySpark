@@ -1,0 +1,23 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import split, col, dayofmonth, month, to_date
+from pyspark.sql.functions import regexp_replace, regexp_extract
+from pyspark.sql.functions import count, desc, lower, upper
+from pyspark.sql.functions import year
+
+spark = SparkSession.builder.appName('Orders').config("spark.sql.legacy.timeParserPolicy", "LEGACY").getOrCreate()
+
+file_path2 = r"D:\Data\Data Engineering\Big Data CS_Project\Udemy_Spark\RetailDB+SalesData\RetailDB SalesData\Order_items\part-00000"
+order_item = spark.read.text(file_path2)
+order_item = order_item.withColumn("split_col", split(col("value"), ","))
+
+order_item = order_item.select(
+     col("split_col")[0].alias("id"),
+     col("split_col")[1].alias("cust_id"),
+     col("split_col")[2].alias("product_id2"),
+     col("split_col")[3].alias("id2"),
+     col("split_col")[4].alias("price"),
+)
+
+sql_data = order_item.createOrReplaceTempView("Order_sql")
+df = spark.sql("select sum(price) from Order_sql where cust_id = 2")
+df.show()
