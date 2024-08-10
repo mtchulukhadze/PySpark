@@ -1,0 +1,30 @@
+# download jdbc jar file from: https://github.com/microsoft/sql-spark-connector/releases >>Apache Spark Connector for SQL Server and Azure SQL >> apache-spark-sql-connector.jar
+
+# save it to spark folder: 
+
+import findspark
+findspark.init()
+findspark.find()
+
+
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName("SQLServerConnection").getOrCreate()
+
+server_name = "jdbc:sqlserver://DESKTOP-3QJN7S3"
+database_name = "Data_Model"
+url = server_name + ";databaseName=" + database_name + ";integratedSecurity=true;"
+
+table_name = "dbo.test" 
+
+try:
+    jdbcDF = spark.read.format("jdbc") \
+        .option("url", url) \
+        .option("driver", "com.microsoft.sqlserver.jdbc.SQLServerDriver") \
+        .option("dbtable", table_name) \
+        .load()
+
+    jdbcDF.show()
+    print(f"Row count: {jdbcDF.count()}")
+except Exception as e:
+    print(f"An error occurred: {e}")
