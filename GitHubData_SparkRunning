@@ -1,0 +1,64 @@
+
+class Spark:
+    def __init__(self):
+        pass
+
+    def GetData(self):
+        import requests
+
+        # url_1
+        url = 'https://raw.githubusercontent.com/Vamshi-Munukuntla/NorthWind-PySpark-Project/main/Data/Customers.csv'
+        response = requests.get(url)
+
+        # saving Data
+        with open('Customers.csv', 'wb') as f:
+            f.write(response.content)
+
+        # rul_2
+        url2 = 'https://raw.githubusercontent.com/Vamshi-Munukuntla/NorthWind-PySpark-Project/refs/heads/main/Data/Employees.csv'
+        response2 = requests.get(url2)
+
+        with open("Employees.csv", "wb") as f:
+            f.write(response2.content)
+
+        # url_3
+        url3 = 'https://raw.githubusercontent.com/Vamshi-Munukuntla/NorthWind-PySpark-Project/refs/heads/main/Data/Orders.csv'
+        response3 = requests.get(url3)
+
+        with open("Orders.csv", "wb") as f:
+            f.write(response3.content)
+
+        # url_4
+        url4 = 'https://raw.githubusercontent.com/Vamshi-Munukuntla/NorthWind-PySpark-Project/refs/heads/main/Data/Products.csv'
+        response4 = requests.get(url4)
+
+        with open('Products.csv', 'wb') as f:
+            f.write(response4.content)
+
+        # url_5
+        url5 = 'https://raw.githubusercontent.com/Vamshi-Munukuntla/NorthWind-PySpark-Project/refs/heads/main/Data/Suppliers.csv'
+        response5 = requests.get(url5)
+
+        with open('Suppliers.csv', 'wb') as f:
+            f.write(response5.content)
+
+    def SparkData(self, name):
+        # spark Data
+        from pyspark.sql import SparkSession
+        spark = SparkSession.builder.appName("Spark").getOrCreate()
+
+        df = spark.read.format('csv').option('header', 'true').load(name+'.csv')
+        self.df = df
+
+
+    def ShowData(self, rn):
+        self.df.show(rn)
+
+    def ShowSchema(self):
+        self.df.printSchema()
+
+
+cl = Spark()
+cl.GetData()
+cl.SparkData('Products')
+cl.ShowData(5)
